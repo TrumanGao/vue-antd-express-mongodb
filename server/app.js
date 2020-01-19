@@ -7,6 +7,10 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+
+var mongoose = require('mongoose'); // 引入mongoose
+mongoose.connect('mongodb://localhost/blog') //连接本地数据库blog 
+
 var app = express();
 
 // view engine setup
