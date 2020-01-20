@@ -13,5 +13,8 @@
     "mongoose": "^5.8.9",
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3"
   }
 }
