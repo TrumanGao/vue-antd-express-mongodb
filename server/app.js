@@ -4,14 +4,21 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
+var indexRouter = require('./routes/index'); // 引入接口代码
+var usersRouter = require('./routes/users'); // 引入接口代码
 
 var mongoose = require('mongoose'); // 引入mongoose
 mongoose.connect('mongodb://localhost/blog') //连接本地数据库blog 
 
 var app = express();
+
+// 处理跨域
+app.all('*',function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+　next();　
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "ant-design-vue": "^1.4.10",
+    "axios": "^0.19.1",
     "babel-plugin-import": "^1.13.0",
     "core-js": "^3.4.4",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-router": "^3.1.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -33,7 +35,9 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "babel-eslint"
     }

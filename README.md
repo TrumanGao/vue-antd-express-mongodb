@@ -1,6 +1,18 @@
 # vue-antd-express-mongodb
 vue-antd-express-mongodb开发的后台，用于电影记录
 
+## 启动项目：
+1. cd server/bin，npm start启动express服务
+2. cd web，npm run serve 启动vue项目
+3. 进入安装mongodb的目录，cd bin，启动mongodb
++ 注意：mongodb开机自动启动，此步骤可忽略
+4. 进入安装adminMongo的目录，npm start启动adminMongo  
++ 前后端关联：
+5. express配置跨域
+6. vue配置接口基准地址
+
+
+## 创建项目：
 1. 创建express服务
 2. 创建vue项目
 3. vue引入ant-design-vue
@@ -12,7 +24,8 @@ vue-antd-express-mongodb开发的后台，用于电影记录
 5. 重启vue项目，成功
 
 6. 进入安装mongodb的目录，cd bin，启动mongodb
++ 注意：mongodb开机自动启动，此步骤可忽略
 7. 访问http://127.0.0.1:27017
 
 8. 进入安装adminMongo的目录，npm start启动adminMongo
-9. 访问http://0.0.0.0:1234/ 
+9. 访问http://localhost:1234/
