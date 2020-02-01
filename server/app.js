@@ -3,17 +3,23 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var bodyParser = require('body-parser'); // 引入JSON解析中间件
 
-var indexRouter = require('./routes/index'); // 引入接口代码
-var usersRouter = require('./routes/users'); // 引入接口代码
+// 引入接口代码
+var indexRouter = require('./routes/index')
+var usersRouter = require('./routes/users')
 var movieRouter = require('./routes/movie')
 
 var app = express();
 
+// 添加json解析
+app.use(bodyParser.json()); // 添加JSON解析
+app.use(bodyParser.urlencoded({extended: false}));
+
 // 处理跨域
 app.all('*',function (req, res, next) {
   res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 　next();　
 })
