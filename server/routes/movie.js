@@ -18,8 +18,18 @@ router.get('/', function(req, res, next) {
 
 router.post('/add', function(req, res, next) {
 	var data = {
-		name: req.body.name,
-		release_year: 1900,
+		name: req.body.name, 
+		privateName: req.body.privateName, 
+		director: req.body.director, 
+		writer: req.body.writer, 
+		cast: req.body.cast, 
+		genre: req.body.genre, 
+		country: req.body.country, 
+		language: req.body.language, 
+		release_year: req.body.release_year, 
+		release_date: req.body.release_date, 
+		doubanId: req.body.doubanId, 
+		imdbId: req.body.imdbId, 
 	}
 	Movie.create(data, (err) => {
 		if (err) {

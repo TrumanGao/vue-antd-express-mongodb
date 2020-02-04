@@ -92,6 +92,44 @@ let Movie = mongoose.model('Movie', movieSchema, 'movie'); //将schema编译为m
 // })
 
 
+// // 聚合管道示例代码
+// var key1 =  {  carrier : "$carrier" , lang : "$lang"}
+// var query1 = { '$or' : [{'impCount': {'$gt' : 3}},{'impCount': {'$lt' : 16}}] }
+// var sort1 =  { os: -1 }
+// var limit1 = 3
+// var skip1 = 0
+// Movie.aggregate(
+// 	[{
+// 			$match: query1
+// 		},
+// 		{
+// 			$group: {
+// 				_id: key1,
+// 				ImpCount: {
+// 					$sum: "$impCount"
+// 				},
+// 				ClickCount: {
+// 					$sum: "$clickCount"
+// 				}
+// 			}
+// 		},
+// 		{
+// 			$sort: sort1
+// 		},
+// 		{
+// 			$limit: limit1
+// 		},
+// 		{
+// 			$skip: skip1
+// 		}
+// 	],
+// 	function(e, docs) {
+// 		if (e)
+// 			console.log(e.message);
+// 		res.send(JSON.stringify(docs));
+// 	}
+// )
+
 module.exports = {
 	mongoose,
 	Movie
