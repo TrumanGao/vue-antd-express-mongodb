@@ -4,27 +4,57 @@ var mongoose = require('./db.js') // 引入数据库基础模块, 连接数据�
 // 创建集合 collection (建表), 定义集合的索引 index (定义表的字段)
 // Mongoose 的一切始于 Schema。每个 schema 都会映射到一个 collection ，并定义这个collection里的文档的构成(索引 indexes, 相当于表头)
 var movieSchema = mongoose.Schema({
-	name: String, // 中文名
-	privateName: String, // 原名
-	director: Array, // 导演
-	writer: Array, // 编剧
-	cast: Array, // 演员
-	genre: Array, // 类型
-	country: Array, // 制片国家/地区
-	language: Array, // 语言
+	name: {
+		type: String,
+		default: '',
+	}, // 中文名
+	privateName: {
+		type: String,
+		default: '',
+	}, // 原名
+	director: {
+		type: Array,
+		default: [],
+	}, // 导演
+	writer: {
+		type: Array,
+		default: [],
+	}, // 编剧
+	cast: {
+		type: Array,
+		default: [],
+	}, // 演员
+	genre: {
+		type: Array,
+		default: [],
+	}, // 类型
+	country: {
+		type: Array,
+		default: [],
+	}, // 制片国家/地区
 	release_year: { // 上映年份
-		type: Number,
-		min: 1895,
+		type: String,
+		default: ''
 	},
 	release_date: { // 上映日期
-		type: Date,
+		type: String,
+		default: '',
 	},
-	doubanId: Number, // 豆瓣ID(主键)
-	imdbId: String, // imdbID
-	score: Number, // 评分
+	doubanId: {
+		type: String,
+		default: '',
+	},
+	imdbId: {
+		type: String,
+		default: '',
+	}, // imdbID
 	updated: { // 添加日期
 		type: Date,
 		default: Date.now
+	},
+	fileList: {
+		type: Array,
+		default: []
 	},
 })
 // 允许使用的 SchemaTypes 有: Number, String, Date, Buffer, Boolean, Mixed, ObjectId, Array

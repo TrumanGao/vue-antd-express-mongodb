@@ -18,6 +18,9 @@ import {
 	Form,
 	Rate,
 	Select,
+	Modal,
+	Popconfirm,
+	Upload,
 	Table,
 	Icon
 } from 'ant-design-vue';
@@ -36,6 +39,9 @@ Vue.prototype.$message = message; // 挂载到vue实例上
 Vue.use(Input)
 Vue.use(Form)
 Vue.use(Rate)
+Vue.use(Modal)
+Vue.use(Popconfirm)
+Vue.use(Upload)
 Vue.use(Select)
 Vue.use(Table)
 Vue.use(Icon)
