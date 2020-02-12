@@ -5,16 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser'); // 引入JSON解析中间件
 
-// 上传文件
-// let fs = require('fs');
-// let formidable = require('formidable');
-// let sd = require('silly-datetime'); // 时间格式化插件
-
-
 // 引入接口代码
 var indexRouter = require('./routes/index')
 var usersRouter = require('./routes/users')
 var movieRouter = require('./routes/movie')
+var celebrityRouter = require('./routes/celebrity')
 
 var app = express();
 
@@ -53,6 +48,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/movie', movieRouter)
+app.use('/celebrity', celebrityRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

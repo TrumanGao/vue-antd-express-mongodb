@@ -1,9 +1,9 @@
 <template>
-	<div class="home-page">
+	<div class="addmovie-page">
 
-		<div class="home-title">添加电影</div>
+		<div class="addmovie-title">添加电影</div>
 
-		<a-form id="home-form" :form="form" @submit="addMovie">
+		<a-form id="addmovie-form" :form="form" @submit="addMovie">
 
 			<a-form-item v-bind="formItemLayout" label="电影名称">
 				<a-input v-decorator="['name', {rules: [{ required: true, message: '请输入电影名称', }]}]" />
@@ -40,7 +40,7 @@
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="豆瓣id">
-				<a-input v-decorator="['doubanId', {rules: [{required: true, message: '请输入豆瓣id'}]}]" />
+				<a-input v-decorator="['subjectId', {rules: [{required: true, message: '请输入豆瓣id'}]}]" />
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="上传图片">
@@ -118,7 +118,7 @@
 				}
 			},
 			addMovie(e) { // 提交电影
-				e.preventDefault();
+				e.preventDefault(); // 该方法将通知 Web 浏览器不要执行与事件关联的默认动作（如果存在这样的动作）
 				this.form.validateFields((err, values) => {
 					if (!err) {
 						console.log('通过验证', values);
@@ -132,7 +132,7 @@
 							}
 						})) : ""
 						this.$axios
-							.post("/movie/subject/add", values).then(res => {
+							.post("/movie/add", values).then(res => {
 								console.log('添加电影返回结果', res)
 								if (res.data.code == 200) {
 									this.$message.success(res.data.message);
@@ -149,7 +149,7 @@
 </script>
 
 <style scoped>
-	.home-title {
+	.addmovie-title {
 		text-align: center;
 		font-size: 20px;
 		line-height: 64px;

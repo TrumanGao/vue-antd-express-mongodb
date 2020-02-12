@@ -4,8 +4,9 @@
 			<a-layout-header>
 				<a-menu theme="dark" v-model="currentKey" @click="menuClick" mode="horizontal" :defaultSelectedKeys="['1']" :style="{ lineHeight: '64px' }">
 					<a-menu-item key="1">鼓瑟吹笙</a-menu-item>
-					<a-menu-item key="2">华山论剑</a-menu-item>
-					<a-menu-item key="3">影史拾珍</a-menu-item>
+					<a-menu-item key="2">青梅煮酒</a-menu-item>
+					<a-menu-item key="3">华山论剑</a-menu-item>
+					<a-menu-item key="4">影史拾珍</a-menu-item>
 				</a-menu>
 			</a-layout-header>
 			<a-layout-content>
@@ -28,12 +29,14 @@
 			}
 		},
 		created() {
-			if (this.$route.path == '/home') {
+			if (this.$route.path == '/addMovie') {
 				this.currentKey = ["1"]
-			} else if (this.$route.path == '/ranking') {
+			} else if (this.$route.path == '/addCelebrity') {
 				this.currentKey = ["2"]
-			} else if (this.$route.path == '/history') {
+			} else if (this.$route.path == '/ranking') {
 				this.currentKey = ["3"]
+			}else if (this.$route.path == '/history') {
+				this.currentKey = ["4"]
 			}
 		},
 		methods: {
@@ -41,10 +44,12 @@
 				if (e.key == this.currentKey[0]) {
 					return
 				} else if (e.key == 1) {
-					this.$router.push('/home')
+					this.$router.push('/addMovie')
 				} else if (e.key == 2) {
-					this.$router.push('/ranking')
+					this.$router.push('/addCelebrity')
 				} else if (e.key == 3) {
+					this.$router.push('/ranking')
+				}else if (e.key == 4) {
 					this.$router.push('/history')
 				}
 			}

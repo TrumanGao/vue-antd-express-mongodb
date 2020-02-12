@@ -22,11 +22,13 @@ import {
 	Popconfirm,
 	Upload,
 	Table,
-	Icon
+	Icon,
+	Timeline,
+	Radio,
+	DatePicker,
+	LocaleProvider,
 } from 'ant-design-vue';
-/* v1.1.2 */
-// Vue.component(Button.name, Button);
-// Vue.component(Button.Group.name, Button.Group);
+
 /* v1.1.3+ 自动注册Button下组件，如Button.Group */
 Vue.use(Layout)
 Vue.use(Breadcrumb)
@@ -45,7 +47,11 @@ Vue.use(Upload)
 Vue.use(Select)
 Vue.use(Table)
 Vue.use(Icon)
-
+Vue.use(Radio)
+Vue.use(Timeline)
+Vue.use(DatePicker)
+Vue.use(LocaleProvider)
+ 
 Vue.config.productionTip = false
 
 import App from './App.vue'
