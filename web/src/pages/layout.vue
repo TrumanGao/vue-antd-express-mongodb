@@ -8,6 +8,10 @@
 					<a-menu-item key="3">华山论剑</a-menu-item>
 					<a-menu-item key="4">影史拾珍</a-menu-item>
 				</a-menu>
+				<div class="header-control">
+					<router-link to="" class="control-text" @click.native="showRegisterLogin(1)">登录</router-link>
+					<router-link to="" class="control-text" @click.native="showRegisterLogin(2)">注册</router-link>
+				</div>
 			</a-layout-header>
 			<a-layout-content>
 				<div>
@@ -35,7 +39,7 @@
 				this.currentKey = ["2"]
 			} else if (this.$route.path == '/ranking') {
 				this.currentKey = ["3"]
-			}else if (this.$route.path == '/history') {
+			} else if (this.$route.path == '/history') {
 				this.currentKey = ["4"]
 			}
 		},
@@ -49,9 +53,13 @@
 					this.$router.push('/addCelebrity')
 				} else if (e.key == 3) {
 					this.$router.push('/ranking')
-				}else if (e.key == 4) {
+				} else if (e.key == 4) {
 					this.$router.push('/history')
 				}
+			},
+			showRegisterLogin(type){
+				this.$store.commit('setRegisterLoginType', type)
+				this.$store.commit('setIsRegisterLogin', true)
 			}
 		}
 	}
@@ -64,6 +72,27 @@
 
 	.ant-layout-header {
 		padding: 0;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.header-control {
+		cursor: pointer;
+		text-decoration: none;
+		padding-right: 10px;
+	}
+
+	.control-text {
+		display: inline-block;
+		padding: 0 10px;
+		color: rgba(255, 255, 255, 0.65)
+	}
+
+	.control-text:hover,
+	.control-text:active,
+	.control-text:focus{
+		color: #FFFFFF;
+		text-decoration: none;
 	}
 
 	.ant-layout-content {

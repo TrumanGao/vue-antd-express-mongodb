@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import router from '@/router'
 
+// 引入Vuex
+import store from '@/store/index.js'
+
 // 引入自定义网络请求插件
 import Http from '@/plugins/http'
 Vue.use(Http)
@@ -15,6 +18,7 @@ import {
 	Button,
 	message,
 	Input,
+	InputNumber,
 	Form,
 	Rate,
 	Select,
@@ -27,6 +31,7 @@ import {
 	Radio,
 	DatePicker,
 	LocaleProvider,
+	Tabs,
 } from 'ant-design-vue';
 
 /* v1.1.3+ 自动注册Button下组件，如Button.Group */
@@ -39,6 +44,7 @@ Vue.use(Button)
 Vue.use(message)
 Vue.prototype.$message = message; // 挂载到vue实例上
 Vue.use(Input)
+Vue.use(InputNumber)
 Vue.use(Form)
 Vue.use(Rate)
 Vue.use(Modal)
@@ -51,6 +57,7 @@ Vue.use(Radio)
 Vue.use(Timeline)
 Vue.use(DatePicker)
 Vue.use(LocaleProvider)
+Vue.use(Tabs)
  
 Vue.config.productionTip = false
 
@@ -58,5 +65,6 @@ import App from './App.vue'
 
 new Vue({
 	render: h => h(App),
+	store,
 	router,
 }).$mount('#app')

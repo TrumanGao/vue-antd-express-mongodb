@@ -9,8 +9,87 @@ var express = require('express');
 var router = express.Router();
 
 /* 查询电影列表 */
-router.get('/list', function(req, res, next) {
-	Movie.find({}, function(err, doc) {
+router.get('/', function(req, res, next) {
+	// console.log('查询电影参数', req.query)
+	let {
+		keyword,
+		current,
+		pageSize,
+		sortField,
+		sortOrder,
+		genre
+	} = req.query
+	current = Number(current)
+	pageSize = Number(pageSize)
+	// console.log('分页', current, pageSize)
+
+	let searchConfig = {}
+	if (keyword || genre) {
+		searchConfig['$or'] = []
+		if (keyword) {
+			// console.log('有关键字', keyword)
+			searchConfig['$or'] = [{
+					name: {
+						$regex: keyword // $regex 正则，用于模糊查询
+					}
+				},
+				{
+					privateName: {
+						$regex: keyword,
+						$options: '$i' // 不区分大小写
+					}
+				},
+				{
+					director: {
+						$elemMatch: {
+							$eq: keyword // director数组内查询值为keyword的元素
+						}
+					}
+				},
+				{
+					cast: {
+						$elemMatch: {
+							$eq: keyword // cast数组内查询值为keyword的元素
+						}
+					}
+				},
+			]
+		}
+
+		if (genre) {
+			// console.log('有类型', JSON.parse(genre))
+			if (keyword) {
+				JSON.parse(genre).forEach(item => {
+					searchConfig['$or'].forEach(item2 => {
+						item2.genre = {
+							$elemMatch: {
+								$eq: item
+							}
+						}
+					})
+				})
+			} else {
+				JSON.parse(genre).forEach(item => {
+					searchConfig['$or'].push({
+						genre: {
+							$elemMatch: {
+								$eq: item
+							}
+						}
+					})
+				})
+			}
+		}
+	}
+
+	let sortConfig = {}
+	if (sortField) {
+		sortConfig[sortField] = sortOrder
+		// console.log('有排序规则', sortConfig)
+	}
+
+	// console.log('最终查询配置', JSON.stringify(searchConfig))
+	Movie.countDocuments(searchConfig, (err, total) => {
 		if (err) {
 			return res.json({
 				message: '查询失败',
@@ -18,16 +97,31 @@ router.get('/list', function(req, res, next) {
 				data: err
 			})
 		}
-		return res.json({
-			message: '查询成功',
-			code: 200,
-			data: doc,
+
+		Movie.find(searchConfig).skip((current - 1) * pageSize).limit(pageSize).collation({
+			locale: 'zh'
+		}).sort(sortConfig).exec(function(err, doc) {
+			if (err) {
+				return res.json({
+					message: '查询失败',
+					code: 2000,
+					data: err
+				})
+			}
+			return res.json({
+				message: '查询成功',
+				code: 200,
+				data: {
+					list: doc,
+					total,
+				},
+			})
 		})
 	})
 });
 
 // 上传电影图片
-router.post('/picture/add', function(req, res, next) {
+router.post('/picture', function(req, res, next) {
 	// console.log('上传文件req:', req)
 	// 创建上传表单对象
 	var form = new formidable.IncomingForm();
@@ -110,7 +204,7 @@ router.post('/picture/add', function(req, res, next) {
 })
 
 // 添加电影
-router.post('/add', function(req, res, next) {
+router.post('/', function(req, res, next) {
 	var data = {
 		name,
 		privateName,
@@ -148,8 +242,8 @@ router.post('/add', function(req, res, next) {
 })
 
 // 编辑电影
-router.post('/edit', function(req, res, next) {
-	console.log('编辑电影参数', req.body)
+router.put('/', function(req, res, next) {
+	// console.log('编辑电影参数', req.body)
 	condiction = {
 		subjectId: req.body.subjectId
 	}
@@ -193,6 +287,5 @@ router.delete('/delete', function(req, res, next) {
 	})
 })
 
-router.get('/')
 
 module.exports = router;

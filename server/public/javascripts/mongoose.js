@@ -41,6 +41,7 @@ var movieSchema = mongoose.Schema({
 // 三. 定义数据库模型(model), 操作数据库
 let Movie = mongoose.model('Movie', movieSchema, 'movie'); //将schema编译为model构造函数(参数一: 首字母大写, 要和集合名称对应; 参数三是操作的collection的名称，若缺省，默认为参数name值的复数形式)
 
+Movie.update({}, {"$rename" : {doubanId : "subjectId"}}, {safe: false, multi: true})
 // 3-1. 增加数据
 // documents 是 Models 的实例。 Document 有很多自带的实例方法， 当然也可以自定义方法
 // 每个 document 会在调用他的 save 方法后保存到数据库。 注意回调函数的第一个参数永远是 error 。

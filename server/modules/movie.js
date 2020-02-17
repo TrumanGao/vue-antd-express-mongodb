@@ -33,12 +33,12 @@ var movieSchema = mongoose.Schema({
 		default: [],
 	}, // 制片国家/地区
 	release_year: { // 上映年份
-		type: String,
-		default: ''
+		type: Number,
+		default: 0
 	},
 	release_date: { // 上映日期
-		type: String,
-		default: '',
+		type: Date,
+		default: null,
 	},
 	subjectId: {
 		type: String,

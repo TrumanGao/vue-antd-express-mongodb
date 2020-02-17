@@ -7,7 +7,7 @@ var bodyParser = require('body-parser'); // 引入JSON解析中间件
 
 // 引入接口代码
 var indexRouter = require('./routes/index')
-var usersRouter = require('./routes/users')
+var userRouter = require('./routes/user')
 var movieRouter = require('./routes/movie')
 var celebrityRouter = require('./routes/celebrity')
 
@@ -23,14 +23,13 @@ app.use(bodyParser.urlencoded({
 app.all('*', function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', 'http://localhost:8080'); // 允许的域
 	res.header('Access-Control-Allow-Headers',
-		'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild'); // 允许的header类型
+		'Content-Type, Content-Length, Authorization, Accept, X-Requested-With, TOKEN'); // 允许的header类型,如果没有配置,会出现跨域问题
 	res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 	if (req.method == "OPTIONS") {
 		res.send(200); /*让options请求快速返回*/
 	} else {
 		next();
 	}
-
 })
 
 // view engine setup
@@ -46,7 +45,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/user', userRouter);
 app.use('/movie', movieRouter)
 app.use('/celebrity', celebrityRouter)
 

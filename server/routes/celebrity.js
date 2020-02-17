@@ -9,7 +9,7 @@ var express = require('express');
 var router = express.Router();
 
 // 上传影人图片
-router.post('/picture/add', function(req, res, next) {
+router.post('/picture', function(req, res, next) {
 	// console.log('上传文件req:', req)
 	var form = new formidable.IncomingForm(); // 创建上传表单对象
 	form.encoding = 'utf-8'; // 设置编码格式
@@ -87,7 +87,7 @@ router.post('/picture/add', function(req, res, next) {
 })
 
 // 添加影人
-router.post('/add', function(req, res, next) {
+router.post('/', function(req, res, next) {
 	var data = {
 		name,
 		privateName,
@@ -118,7 +118,7 @@ router.post('/add', function(req, res, next) {
 })
 
 // 编辑影人
-router.post('/edit', function(req, res, next) {
+router.put('/', function(req, res, next) {
 	Celebrity.update({
 		celebrityId: req.body.celebrityId
 	}, {
@@ -158,8 +158,6 @@ router.delete('/delete', function(req, res, next) {
 		})
 	})
 })
-
-router.get('/', )
 
 
 module.exports = router;

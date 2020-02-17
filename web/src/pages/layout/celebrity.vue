@@ -36,12 +36,8 @@
 				<a-input v-decorator="['celebrityId', {rules: [{required: true, message: '请输入豆瓣id'}]}]" />
 			</a-form-item>
 
-			<a-form-item v-bind="formItemLayout" label="IMDBid">
-				<a-input v-decorator="['imdbId']" />
-			</a-form-item>
-
 			<a-form-item v-bind="formItemLayout" label="上传图片">
-				<a-upload :action="$axios.defaults.baseURL + '/celebrity/picture/add'" listType="picture-card" :multiple="true"
+				<a-upload :action="$axios.defaults.baseURL + '/celebrity/picture'" listType="picture-card" :multiple="true"
 				 :remove="handleRemove" v-decorator="['fileList', {valuePropName: 'fileList', getValueFromEvent: normPictures,}]"
 				 @preview="handlePreview">
 					<div v-if="fileList.length <= 5">
@@ -112,7 +108,7 @@
 					return fileList;
 				}
 			},
-			addCelebrity(e) { // 提交电影
+			addCelebrity(e) { // 提交影人
 				e.preventDefault();
 				this.form.validateFields((err, values) => {
 					if (!err) {
@@ -127,8 +123,13 @@
 							}
 						})) : ""
 						values.birthday = values.birthday.format('YYYY-MM-DD')
+						for(let i in values){
+							if(typeof(values[i])=='string'){
+								values[i] = values[i].trim()
+							}
+						}
 						this.$axios
-							.post("/celebrity/add", values).then(res => {
+							.post("/celebrity", values).then(res => {
 								console.log('添加电影返回结果', res)
 								if (res.data.code == 200) {
 									this.$message.success(res.data.message);

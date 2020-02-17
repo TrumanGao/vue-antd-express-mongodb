@@ -14,15 +14,15 @@
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="导演">
-				<a-input placeholder="请输入导演名称，多个用空格分隔" v-decorator="['director']" />
+				<a-input placeholder="请输入导演ID，多个用空格分隔" v-decorator="['director']" />
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="编剧">
-				<a-input placeholder="请输入编剧名称，多个用空格分隔" v-decorator="['writer']" />
+				<a-input placeholder="请输入编剧ID，多个用空格分隔" v-decorator="['writer']" />
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="主演">
-				<a-input placeholder="请输入主演名称，多个用空格分隔" v-decorator="['cast']" />
+				<a-input placeholder="请输入主演ID，多个用空格分隔" v-decorator="['cast']" />
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="类型">
@@ -36,7 +36,7 @@
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="上映年份">
-				<a-input v-decorator="['release_year', {rules: [{required: true,  message: '请输入上映年份'}]}]" />
+				<a-input-number v-decorator="['release_year', {rules: [{required: true,  message: '请输入上映年份', type: 'number'}]}]" :min="1895" :max="new Date().getFullYear()" />
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="豆瓣id">
@@ -44,7 +44,7 @@
 			</a-form-item>
 
 			<a-form-item v-bind="formItemLayout" label="上传图片">
-				<a-upload :action="$axios.defaults.baseURL + '/movie/picture/add'" listType="picture-card" :multiple="true" :remove="handleRemove"
+				<a-upload :action="$axios.defaults.baseURL + '/movie/picture'" listType="picture-card" :multiple="true" :remove="handleRemove"
 				 v-decorator="['fileList', {valuePropName: 'fileList', getValueFromEvent: normPictures,}]" @preview="handlePreview">
 					<div v-if="fileList.length <= 5">
 						<a-icon type="plus" />
@@ -131,8 +131,13 @@
 								url: item.resUrl, // 文件地址
 							}
 						})) : ""
+						for(let i in values){
+							if(typeof(values[i])=='string'){
+								values[i] = values[i].trim()
+							}
+						}
 						this.$axios
-							.post("/movie/add", values).then(res => {
+							.post("/movie", values).then(res => {
 								console.log('添加电影返回结果', res)
 								if (res.data.code == 200) {
 									this.$message.success(res.data.message);
@@ -153,6 +158,9 @@
 		text-align: center;
 		font-size: 20px;
 		line-height: 64px;
+	}
+	.ant-input-number{
+		width: 100%;
 	}
 
 	.form-submit-btn {

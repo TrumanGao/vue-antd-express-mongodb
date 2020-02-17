@@ -1,10 +1,16 @@
 <template>
 	<div class="ranking-page">
-		<a-table bordered :rowKey="record => record.subjectId" :columns="columns" :dataSource="movieList" :loading="loading"
+		<div class="ranking-search">
+			<a-input-search class="search-input" v-model="searchQuery.keyword" placeholder="请输入电影名称 / 影人名称" @search="getMovieList"
+			 enterButton="搜索" />
+		</div>
+		<a-table bordered :rowKey="record => record.subjectId" :columns="columns" :dataSource="movieList" :pagination="pagination" :loading="loading"
 		 @change="handleTableChange">
 			<!-- slot: 标签上使用数据，与 columns.scopedSlots.customRender 一致 -->
 			<!-- slot-scope：插值使用数据 -->
 			<router-link slot="name" slot-scope="name, record" :to="'/subject/' + record.subjectId">{{name}}</router-link>
+			<div slot="release_year" slot-scope="release_year">{{release_year}}</div>
+			
 			<template slot="director" slot-scope="text, record">
 				<a-input v-if="record.isEdit" v-model="itemData.director" />
 				<template v-else>
@@ -50,7 +56,6 @@
 				<div class="table-expand-item" v-if="record.privateName">原名：
 					<router-link :to="'/subject/' + record.subjectId">{{record.privateName}}</router-link>
 				</div>
-				<div class="table-expand-item" v-if="record.release_year">上映年份：{{record.release_year}}</div>
 				<div class="table-expand-item" v-if="record.writer && record.writer.length > 0">编剧：
 					<span v-for="(item, index) in record.writer" :key="index">
 						<span v-if="index != 0"> / </span>
@@ -66,30 +71,47 @@
 	export default {
 		data() {
 			return {
+				searchQuery: {
+					keyword: "", // 查询参数
+					current: 1,
+					pageSize: 5,
+					sortField: "",
+					sortOrder: 1, // 排序方式，正序1，倒序-1。
+					genre: '',
+				},
 				movieList: [],
-				pagination: {},
+				pagination: {
+					current: 1,
+					pageSize: 5,
+					total: 0, // 电影总数
+				},
 				itemData: {}, // 用于编辑条目
 				loading: false,
 				columns: [{
 						title: '中文名', // 列头显示文字
 						dataIndex: 'name', // 列数据在数据项中对应的 key，支持 a.b.c 的嵌套写法
 						sorter: true, // 排序函数，本地排序使用一个函数(参考 Array.sort 的 compareFunction)，需要服务端排序可设为 true
+						scopedSlots: { // 使用columns时，可以通过该属性配置支持slot-scope的属性
+							customRender: 'name', // 生成复杂数据的渲染函数，参数分别为当前行的值，当前行数据，行索引
+						}
+					},  {
+						title: '上映年份',
+						dataIndex: 'release_year',
+						sorter: true,
 						scopedSlots: {
-							customRender: 'name',
+							customRender: 'release_year',
 						}
 					}, {
 						title: '导演',
 						dataIndex: 'director',
-						sorter: true,
-						scopedSlots: {
-							customRender: 'director',
+						scopedSlots: { 
+							customRender: 'director', 
 						}
 					}, {
 						title: '主演',
 						dataIndex: 'cast',
-						sorter: true,
-						scopedSlots: { // 使用columns时，可以通过该属性配置支持slot-scope的属性
-							customRender: 'cast' // 生成复杂数据的渲染函数，参数分别为当前行的值，当前行数据，行索引
+						scopedSlots: {
+							customRender: 'cast',
 						}
 					}, {
 						title: '类型',
@@ -195,16 +217,15 @@
 					{
 						title: '制片国家/地区',
 						dataIndex: 'country',
-						sorter: true,
 						scopedSlots: {
 							customRender: 'country',
-						}
+						},
 					},
 					{
 						title: '豆瓣链接',
 						dataIndex: 'subjectId',
-						scopedSlots: { // 使用columns时，可以通过该属性配置支持slot-scope的属性
-							customRender: 'subjectId' // 生成复杂数据的渲染函数，参数分别为当前行的值，当前行数据，行索引
+						scopedSlots: {
+							customRender: 'subjectId'
 						}
 					},
 					{
@@ -223,23 +244,32 @@
 		methods: {
 			getMovieList() {
 				this.loading = true
-				this.$axios.get("/movie/list").then(res => {
-					if (res.data.code == 200) {
-						this.movieList = res.data.data
+				this.$axios.get("/movie", {
+					params: this.searchQuery
+				}).then(({
+					data
+				}) => {
+					if (data.code == 200) {
+						this.movieList = data.data.list
+						this.pagination.total = data.data.total
+						this.pagination.current = this.searchQuery.current
+						this.pagination.pageSize = this.searchQuery.pageSize
 					} else {
-						this.$message.error(res.data.message || "查询电影失败")
+						this.$message.error(data.message || "查询电影失败")
 					}
 					this.loading = false
 					console.log('查询到的电影列表', this.movieList)
 				});
 			},
 			editMovie(id) {
+				console.log(id)
 				this.movieList.map(item => {
 					if (item.subjectId === id) {
 						this.$set(item, 'isEdit', true)
 						this.itemData = Object.assign(JSON.parse(JSON.stringify(item)), {
 							director: item.director.join(' ')
 						})
+						console.log(JSON.parse(JSON.stringify(this.itemData)))
 					}
 				})
 			},
@@ -256,8 +286,8 @@
 			},
 			saveEdit(record) {
 				record = JSON.parse(JSON.stringify(this.itemData))
-				record.director = record.director ? record.director.split(' ') : []
-				this.$axios.post('/movie/edit', record).then(({
+				record.director = record.director ? record.director.trim().split(' ') : []
+				this.$axios.put('/movie', record).then(({
 					data
 				}) => {
 					if (data.code == 200) {
@@ -270,44 +300,15 @@
 			},
 			/* 处理表格操作：翻页，筛选，排序 */
 			handleTableChange(pagination, filters, sorter) {
-				console.log(pagination);
-				const pager = { ...this.pagination
-				};
-				pager.current = pagination.current;
-				this.pagination = pager;
-				this.fetch({
-					results: pagination.pageSize,
-					page: pagination.current,
-					sortField: sorter.field,
-					sortOrder: sorter.order,
-					...filters,
-				});
-			},
-			fetch(params = {}) {
-				console.log('params:', params);
-				this.loading = true
-				// reqwest({
-				// 	url: 'https://randomuser.me/api',
-				// 	method: 'get',
-				// 	data: {
-				// 		results: 10,
-				// 		...params,
-				// 	},
-				// 	type: 'json',
-				// }).then((data) => {
-				// 	const pagination = { ...this.pagination
-				// 	};
-				// 	// Read total count from server
-				// 	// pagination.total = data.totalCount;
-				// 	pagination.total = 200;
-				// 	this.loading = false;
-				// 	this.data = data.results;
-				// 	this.pagination = pagination;
-				// });
+				console.log(pagination, filters, sorter);
+				this.searchQuery.current = pagination.current
+				this.searchQuery.pageSize = pagination.pageSize
+				this.searchQuery.genre = filters.genre && filters.genre.length > 0 ? JSON.stringify(filters.genre) : ''
+				this.searchQuery.sortField = sorter.field
+				this.searchQuery.sortOrder = sorter.order == 'ascend' ? 1 : -1
+				this.getMovieList()
 			},
 			/* 处理表格操作：翻页，筛选，排序 */
-
-
 			deletMovie(id) {
 				this.$axios.delete('/movie/delete', {
 					params: {
@@ -329,6 +330,17 @@
 </script>
 
 <style scoped>
+	.ranking-search {
+		display: flex;
+		margin-bottom: 20px;
+	}
+
+	.search-input {
+		width: 300px;
+		margin-right: 10px;
+	}
+
+
 	.table-edit-btn {
 		margin-right: 10px;
 	}

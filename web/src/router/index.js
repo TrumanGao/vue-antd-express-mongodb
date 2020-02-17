@@ -2,16 +2,16 @@ import Vue from 'vue'
 import Router from 'vue-router'
 Vue.use(Router)
 
-import Welcome from '@/page/welcome.vue' // 欢迎页
-import Layout from '@/page/layout.vue' // 根页面
+import Welcome from '@/pages/welcome.vue' // 欢迎页
+import Layout from '@/pages/layout.vue' // 根页面
 
-import AddMovie from '@/page/layout/movie.vue' // 添加电影页
-import AddCelebrity from '@/page/layout/celebrity.vue' // 添加影人页
-import Ranking from '@/page/layout/ranking' // 榜单页
-import History from '@/page/layout/history' // 影史页
+import AddMovie from '@/pages/layout/movie.vue' // 添加电影页
+import AddCelebrity from '@/pages/layout/celebrity.vue' // 添加影人页
+import Ranking from '@/pages/layout/ranking' // 榜单页
+import History from '@/pages/layout/history' // 影史页
 
-import Subject from '@/page/detail' // 电影详情页
-import Celebrity from '@/page/detail/celebrity' // 影人详情页
+import Subject from '@/pages/detail' // 电影详情页
+import Celebrity from '@/pages/detail/celebrity' // 影人详情页
 
 const router = new Router({
 	mode: 'history',
