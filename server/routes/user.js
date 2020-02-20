@@ -1,16 +1,21 @@
 const User = require('../modules/user')
 
+// 文件上传功能
+const fs = require('fs')
+const formidable = require('formidable') // 该模块用于处理客户端以POST方式提交的表单、文件、图片等
+let sd = require('silly-datetime'); // 时间格式化插件
+
+// 用户鉴权功能
 const jwt = require('jsonwebtoken')
 const SECRET = 'gfx93728' // 密钥, 实际开发中应写在本地文件中, 与代码分开
-
 
 const express = require('express');
 const router = express.Router();
 
 // 用户鉴权中间件, 用于需要登录权限才能访问的接口
 const authMiddleware = async (req, res, next) => {
-	console.log('用户鉴权', JSON.parse(JSON.stringify(req.headers.token)))
-	const raw = String(req.headers.token) // token原始值
+	console.log('用户鉴权token', req.headers.token)
+	let raw = req.headers.token ? String(req.headers.token) : '' // token原始值	
 	if (!raw) {
 		return res.json({
 			code: 1000,
@@ -30,6 +35,112 @@ const authMiddleware = async (req, res, next) => {
 	}
 	next()
 }
+
+// 上传用户头像
+router.post('/avatar', authMiddleware, (req, res) => {
+	const form = new formidable.IncomingForm()
+
+	form.uploadDir = './public/pictures/user' // 上传文件存放服务器路径
+
+	form.parse(req, (err, fields, files) => { // 服务端全部接收完客户端用post方式提交的表单数据之后，触发执行该回调函数。fields: 提交的表单域数据; files: 上传的文件、图片等文件域数据。
+		if (err) {
+			return res.json({
+				code: 2000,
+				message: '头像上传失败',
+				data: err
+			})
+		}
+
+		// 设置后缀名
+		let extName = ''
+		switch (files.file.type) {
+			case 'image/pjpeg':
+				extName = 'jpg';
+				break;
+			case 'image/jpeg':
+				extName = 'jpg';
+				break;
+			case 'image/png':
+				extName = 'png';
+				break;
+			case 'image/x-png':
+				extName = 'png';
+				break;
+		}
+		if (!extName) {
+			return res.json({
+				code: 2000,
+				message: '只支持图片格式',
+				data: files
+			})
+		}
+
+		let date = sd.format(new Date(), 'YYYYMMDDHHmmss');
+		let picName = 'avatar_' + req.user._id + '_' + date + '.' + extName
+		let newPath = form.uploadDir + '/' + picName
+		fs.rename(files.file.path, newPath, (err) => {
+			if (err) {
+				return res.json({
+					code: 2000,
+					message: '头像上传失败',
+					data: err
+				})
+			}
+
+			// 修改用户头像
+			User.update({
+				_id: req.user._id
+			}, {
+				avatar: '/pictures/user/' + picName,
+			}, function(err, result) {
+				if (err) {
+					return res.json({
+						code: 2000,
+						message: '修改头像失败',
+						data: err,
+					})
+				}
+				res.json({
+					code: 200,
+					message: '头像上传成功',
+					data: '/pictures/user/' + picName
+				})
+			})
+		})
+	})
+})
+
+// 删除用户头像
+router.delete('/avatar', authMiddleware, (req, res) => {
+	console.log('删除文件参数', req.query)
+	fs.unlink('./public/pictures/user/' + req.query.name, (err) => {
+		if (err) {
+			return res.json({
+				code: 2000,
+				message: '删除用户头像失败',
+				data: err
+			})
+		}
+		User.update({
+			_id: req.user._id
+		}, {
+			avatar: ''
+		}, (err, result) => {
+			if (err) {
+				return res.json({ 
+					code: 2000,
+					message: '删除用户头像失败',
+					data: err
+				})
+			}
+			res.json({
+				code: 200,
+				message: '删除用户头像成功',
+				data: req.query.name
+			})
+		})
+	});
+})
 
 // 获取用户信息
 router.get('/', authMiddleware, (req, res, next) => {
@@ -74,7 +185,7 @@ router.post('/login', async (req, res, next) => {
 });
 
 // 退出登录
-router.post('/logout', (req, res)=>{
+router.post('/logout', (req, res) => {
 	res.json({
 		code: 200,
 		message: '退出登录成功',

@@ -7,16 +7,20 @@ var userSchema = mongoose.Schema({
 		default: '',
 		unique: true,
 	},
+	avatar: {
+		type: String,
+		default: '',
+	},
 	password: {
 		type: String,
 		default: '',
-		set(val){ // 字定义方法,转化值
+		set(val) { // 字定义方法,转化值
 			return require('bcrypt').hashSync(val, 10) // 引入散列模块,用于密码加密.同步方法散列密码
 		},
 	},
 	mobile: {
 		type: String,
-		default:'',
+		default: '',
 	},
 	email: {
 		type: String,

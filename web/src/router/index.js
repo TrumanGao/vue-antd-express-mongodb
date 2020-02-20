@@ -12,6 +12,7 @@ import History from '@/pages/layout/history' // 影史页
 
 import Subject from '@/pages/detail' // 电影详情页
 import Celebrity from '@/pages/detail/celebrity' // 影人详情页
+import Personal from '@/pages/personal' // 个人中心
 
 const router = new Router({
 	mode: 'history',
@@ -24,12 +25,12 @@ const router = new Router({
 			name: 'subject',
 			path: '/subject/:id',
 			component: Subject,
-		}, 
+		},
 		{
 			name: 'celebrity',
 			path: '/celebrity/:name',
 			component: Celebrity,
-		},{
+		}, {
 			name: 'layout',
 			path: '/',
 			redirect: '/addMovie',
@@ -38,7 +39,7 @@ const router = new Router({
 			children: [{
 					path: '/addMovie',
 					component: AddMovie
-				},{
+				}, {
 					path: '/addCelebrity',
 					component: AddCelebrity
 				},
@@ -49,10 +50,23 @@ const router = new Router({
 				{
 					path: '/history',
 					component: History,
+				}, {
+					path: '/personal',
+					component: Personal,
 				},
 			]
 		},
 	]
+})
+
+router.beforeEach((to, from, next) => {
+	if (to.path == '/personal') {
+		if (!localStorage.getItem('token')) {
+			console.log('未登录, 全局导航守卫')
+			next('addMovie')
+		}
+	}
+	next()
 })
 
 export default router

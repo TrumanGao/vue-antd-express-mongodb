@@ -31,7 +31,6 @@ import {
 	Radio,
 	DatePicker,
 	LocaleProvider,
-	Tabs,
 } from 'ant-design-vue';
 
 /* v1.1.3+ 自动注册Button下组件，如Button.Group */
@@ -57,14 +56,14 @@ Vue.use(Radio)
 Vue.use(Timeline)
 Vue.use(DatePicker)
 Vue.use(LocaleProvider)
-Vue.use(Tabs)
  
 Vue.config.productionTip = false
 
 import App from './App.vue'
 
-new Vue({
+export default new Vue({
 	render: h => h(App),
 	store,
 	router,
 }).$mount('#app')
+

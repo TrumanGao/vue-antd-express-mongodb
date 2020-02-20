@@ -125,7 +125,7 @@ router.post('/picture', function(req, res, next) {
 	// console.log('上传文件req:', req)
 	// 创建上传表单对象
 	var form = new formidable.IncomingForm();
-	// 设置编码格式
+	// 设置编码格式, 解决中文乱码
 	form.encoding = 'utf-8';
 	// 设置上传目录
 	form.uploadDir = '../server/public/pictures/movie';
@@ -146,7 +146,7 @@ router.post('/picture', function(req, res, next) {
 		}
 		// 限制文件大小 单位默认字节 这里限制大小为2m
 		if (filesFile.size > form.maxFieldsSize) {
-			fs.unlink(filesFile.path)
+			fs.unlink(filesFile.path) // 删除文件操作
 			return res.json({
 				code: 2000,
 				message: "图片大小不能超过2M",

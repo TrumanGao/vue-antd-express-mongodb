@@ -10,7 +10,7 @@
 			</div>
 
 			<div class="register-login-content" v-if="$store.state.registerLoginType == 1">
-				<a-form class="register-login-form" :form="formLogin" @submit="handleLogin" v-if="isShowComponent">
+				<a-form class="register-login-form" :form="formLogin" @submit="submitLogin" v-if="isShowComponent">
 					<a-form-item>
 						<a-input size="large" placeholder="请输入用户名" v-decorator="['username',{rules: [{ required: true, message: '请输入用户名' }]}]">
 							<a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
@@ -23,7 +23,7 @@
 					</a-form-item>
 					<div class="form-control">
 						<a-button size="large" class="form-btn" @click="closeRegisterLogin">取消</a-button>
-						<a-button size="large" class="form-btn" type="primary" @click="handleLogin">登录</a-button>
+						<a-button size="large" class="form-btn" type="primary" @click="submitLogin">登录</a-button>
 					</div>
 				</a-form>
 			</div>
@@ -70,36 +70,40 @@
 			changeType(type) {
 				this.$store.commit('setRegisterLoginType', type)
 			},
-			handleLogin() { // 登录
+			submitLogin() { // 登录
 				this.formLogin.validateFields(
 					(err, values) => {
 						if (!err) {
-							this.$axios.post('/user/login', values).then(({
-								data
-							}) => {
-								if (data.code == 200) {
-									// 本地存储token
-									localStorage.setItem('token', data.data);
-									// 把token加入header里
-									this.$axios.defaults.headers.common['TOKEN'] = data.data;
-
-									this.$axios.get('/user').then(({
-										data
-									}) => {
-										if (data.code == 200) {
-											this.$message.success(data.message || '获取用户信息成功')
-											this.$store.commit('setIsRegisterLogin', false)
-										} else {
-											this.$message.error(data.message)
-										}
-									})
-								} else {
-									this.$message.error(data.message || '登录失败')
-								}
-							})
+							this.handleLogin(values)
 						}
 					},
 				);
+			},
+			handleLogin(values) { // 登录
+				this.$axios.post('/user/login', values).then(({
+					data
+				}) => {
+					if (data.code == 200) {
+						// 本地存储token，用于赋值给axios请求头。配置于axios拦截器
+						localStorage.setItem('token', data.data);
+						this.$store.commit('setToken', data.data)
+
+						this.$message.success(data.message || '登录成功')
+						this.$axios.get('/user').then(({ // 获取用户信息
+							data
+						}) => {
+							if (data.code == 200) {
+								this.$store.commit('setIsRegisterLogin', false)
+								localStorage.setItem('userInfo', JSON.stringify(data.data));
+								this.$store.commit('setUserInfo', data.data)
+							} else {
+								this.$message.error(data.message)
+							}
+						})
+					} else {
+						this.$message.error(data.message || '登录失败')
+					}
+				})
 			},
 			handleRegister() { // 注册
 				this.formRegister.validateFields(
@@ -109,8 +113,8 @@
 								data
 							}) => {
 								if (data.code == 200) {
-									this.$message.success(data.message || '注册成功')
-									this.$store.commit('setRegisterLoginType', 1)
+									// this.$message.success(data.message || '注册成功')
+									this.handleLogin(values)
 								} else {
 									this.$message.error(data.message || '注册失败')
 								}
