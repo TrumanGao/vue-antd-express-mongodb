@@ -25,11 +25,21 @@ Http.install = function(Vue) {
 	// 添加响应拦截器
 	axios.interceptors.response.use(function(response) {
 		// console.log('响应拦截response', response)
+
+		// 未登录处理
+		if (response.data && response.data.code === 1000) {
+			if (vue.$route.path.indexOf('personal') !== -1) {
+				vue.$router.push('/')
+				localStorage.removeItem('token')
+				vue.$store.commit('setToken', "")
+				vue.$store.commit('setUserInfo', "")
+			}
+		}
+
 		return response;
 	}, function(error) {
 		return Promise.reject(error);
 	});
-
 
 	//   挂载到vue实例上
 	Vue.prototype.$axios = axios

@@ -16,17 +16,30 @@ export default new Vuex.Store({
 		setRegisterLoginType(state, data) {
 			state.registerLoginType = data
 		},
-		setToken(state, data){
+		setToken(state, data) {
 			state.token = data
 		},
-		setUserInfo(state, data){
+		setUserInfo(state, data) {
 			state.userInfo = data
 		},
 	},
 	actions: {
-		getUserInfo(context){
-			console.log(context)
+		getUserInfo(context, _this) {
+			return new Promise((resolve, reject) => {
+				// 获取用户信息
+				_this.$axios.get('/user').then(({
+					data
+				}) => {
+					if (data.code == 200) {
+						// data.data.birthday = new Date(data.data.birthday)
+						context.commit('setUserInfo', data.data)
+						resolve(data)
+					} else {
+						_this.$message.error(data.message || '获取用户信息失败')
+						reject(data)
+					}
+				})
+			})
 		}
 	}
 })
-

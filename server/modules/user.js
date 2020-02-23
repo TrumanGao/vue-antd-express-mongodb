@@ -32,7 +32,7 @@ var userSchema = mongoose.Schema({
 	},
 	gender: {
 		type: Number,
-		default: 1, // 1 男 2 女
+		default: 3, // 1 男 2 女 3 保密
 	},
 	nationality: { // 国籍
 		type: String,
@@ -42,7 +42,7 @@ var userSchema = mongoose.Schema({
 		type: Date,
 		default: new Date('1900-01-01')
 	},
-	address: {
+	usual_address: {
 		type: String,
 		default: ''
 	},

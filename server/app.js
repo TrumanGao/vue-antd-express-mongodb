@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var bodyParser = require('body-parser'); // 引入JSON解析中间件
+var bodyParser = require('body-parser'); // 调用bodyParser模块以便程序正确解析body传入json值
 
 // 引入接口代码
 var indexRouter = require('./routes/index')

@@ -12,7 +12,7 @@
 					<router-link v-if="!$store.state.userInfo" to="" class="control-text" @click.native="showRegisterLogin(1)">登录</router-link>
 					<router-link v-if="!$store.state.userInfo" to="" class="control-text" @click.native="showRegisterLogin(2)">注册</router-link>
 					<router-link v-if="$store.state.userInfo" to="/personal" class="control-text">{{$store.state.userInfo.username}}</router-link>
-					<router-link v-if="$store.state.userInfo" to="" class="control-text" @click.native="handleLogout(2)">退出</router-link>
+					<router-link v-if="$store.state.userInfo" to="" class="control-text" @click.native="handleLogout">退出</router-link>
 				</div>
 			</a-layout-header>
 			<a-layout-content>
@@ -21,7 +21,7 @@
 				</div>
 			</a-layout-content>
 			<a-layout-footer style="text-align: center">
-				Let's Movie ©2020 Created by Truman Gao
+				Let's Moooovie! ©2020 Created by Truman Gao
 			</a-layout-footer>
 		</a-layout>
 	</div>
@@ -86,11 +86,12 @@
 				}) => {
 					if (data.code == 200) {
 						this.$message.success(data.message || '退出登录成功')
-						this.$router.push('/addMovie')
 						localStorage.removeItem('token')
-						localStorage.removeItem('userInfo')
 						this.$store.commit('setToken', "")
 						this.$store.commit('setUserInfo', "")
+						if (this.$route.path !== '/addMovie') {
+							this.$router.push('/addMovie')
+						}
 					} else {
 						this.$message.error(data.message || '退出登录失败')
 					}
@@ -131,7 +132,7 @@
 	}
 
 	.ant-layout-content {
-		padding: 16px 96px;
+		padding: 32px 96px;
 		min-height: calc(100vh - 64px - 69px);
 	}
 </style>

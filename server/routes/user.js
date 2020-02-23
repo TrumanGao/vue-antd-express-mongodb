@@ -23,18 +23,108 @@ const authMiddleware = async (req, res, next) => {
 			data: req.headers.token,
 		})
 	}
-	const {
-		id
-	} = jwt.verify(raw, SECRET) // 用密钥解token, 获取登录时生成token的id
-	req.user = await User.findById(id) // 把user赋值到req上, 以便next下一个中间件访问
+	try {
+		const {
+			id
+		} = jwt.verify(raw, SECRET) // 用密钥解token, 获取登录时生成token的id
+		req.user = await User.findById(id) // 把user赋值到req上, 以便next下一个中间件访问
+	} catch (err) {
+		if (err.name && err.name == "TokenExpiredError") {
+			return res.json({
+				code: 1000,
+				message: '登录已过期',
+				data: err
+			})
+		}
+		return res.json({
+			code: 1000,
+			message: '登录验证失败',
+			data: err
+		})
+	}
 	if (!req.user) {
 		return res.json({
 			code: 1001,
-			message: '用户不存在'
+			message: '用户不存在',
+			data: ''
 		})
 	}
 	next()
 }
+
+/* 用户登录 */
+router.post('/login', async (req, res, next) => {
+	console.log('用户登录参数', req.body)
+	const user = await User.findOne({ // 先根据用户名获取用户
+		username: req.body.username
+	})
+	if (!user) {
+		return res.json({
+			code: 1001,
+			message: '用户不存在',
+			data: '',
+		})
+	}
+	const isPasswordVaild = require('bcrypt').compareSync(req.body.password, user.password) // 对比用户输入密码(明文)和数据库储存密码(加密)
+	if (!isPasswordVaild) {
+		return res.json({
+			code: 1001,
+			message: '密码错误',
+			data: '',
+		})
+	}
+
+	// 生成token: 现在restful接口倾向于无状态连接,所以通常不用session, 用jwt token
+	const token = jwt.sign({ // 用jwt生成token,参数一来自用户数据,必须是唯一值; 参数二是密钥,用于解token
+		id: String(user._id)
+	}, SECRET, {
+		expiresIn: req.body.isSaveToken ? 60 * 60 * 24 * 10 : 10 // token过期时间(10天/10秒)
+	})
+
+	res.json({
+		code: 200,
+		message: '登录成功',
+		data: token,
+	})
+});
+
+// 退出登录
+router.post('/logout', (req, res) => {
+	res.json({
+		code: 200,
+		message: '退出登录成功',
+		data: ''
+	})
+})
+
+// 用户注册
+router.post('/register', function(req, res, next) {
+	console.log('注册req', req.body)
+	User.create({
+		username: req.body.username,
+		password: req.body.password,
+		mobile: req.body.mobile,
+		email: req.body.email,
+		realname: req.body.realname,
+		gender: req.body.gender,
+		nationality: req.body.nationality,
+		birthday: req.body.birthday,
+		address: req.body.address,
+	}, (err, data) => {
+		if (err) {
+			return res.json({
+				code: 2000,
+				message: '注册失败',
+				data: err,
+			})
+		}
+		res.json({
+			code: 200,
+			message: '注册成功',
+			data,
+		})
+	})
+});
 
 // 上传用户头像
 router.post('/avatar', authMiddleware, (req, res) => {
@@ -110,6 +200,30 @@ router.post('/avatar', authMiddleware, (req, res) => {
 	})
 })
 
+// 编辑用户信息
+router.put('/', authMiddleware, (req, res) => {
+	console.log('编辑用户信息参数', req.body)
+	User.updateOne({
+			_id: req.body._id
+		}, {
+			$set: req.body
+		},
+		(err, result) => {
+			if (err) {
+				return res.json({
+					code: 2000,
+					message: '编辑用户信息失败',
+					data: err
+				})
+			}
+			res.json({
+				code: 200,
+				message: '编辑用户信息成功',
+				data: result
+			})
+		})
+})
+
 // 删除用户头像
 router.delete('/avatar', authMiddleware, (req, res) => {
 	console.log('删除文件参数', req.query)
@@ -121,13 +235,13 @@ router.delete('/avatar', authMiddleware, (req, res) => {
 				data: err
 			})
 		}
-		User.update({
+		User.updateOne({
 			_id: req.user._id
 		}, {
 			avatar: ''
 		}, (err, result) => {
 			if (err) {
-				return res.json({ 
+				return res.json({
 					code: 2000,
 					message: '删除用户头像失败',
 					data: err
@@ -144,82 +258,12 @@ router.delete('/avatar', authMiddleware, (req, res) => {
 
 // 获取用户信息
 router.get('/', authMiddleware, (req, res, next) => {
+	console.log('获取用户信息', req.user)
 	res.json({
 		code: 200,
 		message: '获取用户信息成功',
 		data: req.user
 	})
 })
-
-/* 用户登录 */
-router.post('/login', async (req, res, next) => {
-	const user = await User.findOne({ // 先根据用户名获取用户
-		username: req.body.username
-	})
-	if (!user) {
-		return res.json({
-			code: 1001,
-			message: '用户不存在',
-			data: '',
-		})
-	}
-	const isPasswordVaild = require('bcrypt').compareSync(req.body.password, user.password) // 对比用户输入密码(明文)和数据库储存密码(加密)
-	if (!isPasswordVaild) {
-		return res.json({
-			code: 1001,
-			message: '密码错误',
-			data: '',
-		})
-	}
-
-	// 生成token: 现在restful接口倾向于无状态连接,所以通常不用session, 用jwt token
-	const token = jwt.sign({ // 用jwt生成token,参数一来自用户数据,必须是唯一值; 参数二是密钥,用于解token
-		id: String(user._id)
-	}, SECRET)
-
-	res.json({
-		code: 200,
-		message: '登录成功',
-		data: token,
-	})
-});
-
-// 退出登录
-router.post('/logout', (req, res) => {
-	res.json({
-		code: 200,
-		message: '退出登录成功',
-		data: ''
-	})
-})
-
-// 用户注册
-router.post('/register', function(req, res, next) {
-	console.log('注册req', req.body)
-	User.create({
-		username: req.body.username,
-		password: req.body.password,
-		mobile: req.body.mobile,
-		email: req.body.email,
-		realname: req.body.realname,
-		gender: req.body.gender,
-		nationality: req.body.nationality,
-		birthday: req.body.birthday,
-		address: req.body.address,
-	}, (err, data) => {
-		if (err) {
-			return res.json({
-				code: 2000,
-				message: '注册失败',
-				data: err,
-			})
-		}
-		res.json({
-			code: 200,
-			message: '注册成功',
-			data,
-		})
-	})
-});
 
 module.exports = router;

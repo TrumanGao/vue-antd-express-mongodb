@@ -251,7 +251,7 @@ router.put('/', function(req, res, next) {
 		$set: req.body
 	}
 
-	Movie.update(condiction, query, (err, result) => {
+	Movie.updateOne(condiction, query, (err, result) => {
 		if (err) {
 			return res.json({
 				code: 2000,

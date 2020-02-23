@@ -21,9 +21,12 @@
 			}
 		},
 		created() {
-			let userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : ''
-			this.$store.commit('setUserInfo', userInfo)
 			this.$store.commit('setToken', localStorage.getItem('token'))
+			this.$store.dispatch('getUserInfo', this).then(res => {
+				console.log('获取用户信息成功', res)
+			}).catch(err => {
+				console.error('获取用户信息失败', err)
+			})
 
 			// 页面关闭确认
 			window.onbeforeunload = function(e) {

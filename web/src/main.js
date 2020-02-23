@@ -31,6 +31,7 @@ import {
 	Radio,
 	DatePicker,
 	LocaleProvider,
+	Checkbox,
 } from 'ant-design-vue';
 
 /* v1.1.3+ 自动注册Button下组件，如Button.Group */
@@ -56,6 +57,7 @@ Vue.use(Radio)
 Vue.use(Timeline)
 Vue.use(DatePicker)
 Vue.use(LocaleProvider)
+Vue.use(Checkbox)
  
 Vue.config.productionTip = false
 

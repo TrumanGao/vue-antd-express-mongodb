@@ -21,6 +21,11 @@
 							<a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
 						</a-input>
 					</a-form-item>
+
+					<a-form-item>
+						<a-checkbox v-decorator="['isSaveToken', {valuePropName: 'checked'}]">十天内免登录</a-checkbox>
+					</a-form-item>
+
 					<div class="form-control">
 						<a-button size="large" class="form-btn" @click="closeRegisterLogin">取消</a-button>
 						<a-button size="large" class="form-btn" type="primary" @click="submitLogin">登录</a-button>
@@ -89,16 +94,11 @@
 						this.$store.commit('setToken', data.data)
 
 						this.$message.success(data.message || '登录成功')
-						this.$axios.get('/user').then(({ // 获取用户信息
-							data
-						}) => {
-							if (data.code == 200) {
-								this.$store.commit('setIsRegisterLogin', false)
-								localStorage.setItem('userInfo', JSON.stringify(data.data));
-								this.$store.commit('setUserInfo', data.data)
-							} else {
-								this.$message.error(data.message)
-							}
+
+						this.$store.dispatch('getUserInfo', this).then(() => { // 获取用户信息
+							this.$store.commit('setIsRegisterLogin', false)
+						}).catch(err=>{
+							console.error('获取用户信息失败', err)
 						})
 					} else {
 						this.$message.error(data.message || '登录失败')
