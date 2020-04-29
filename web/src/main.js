@@ -59,7 +59,7 @@ Vue.use(DatePicker)
 Vue.use(LocaleProvider)
 Vue.use(Checkbox)
  
-Vue.config.productionTip = false
+Vue.config.productionTip = false // 阻止启动生产消息，此时是以开发模式运行的
 
 import App from './App.vue'
 
